@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Big Vegas Godot"
+config/name="FactoryGodot"
 run/main_scene="uid://b5h2tondqkhfe"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"

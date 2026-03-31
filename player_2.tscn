@@ -19,8 +19,7 @@ var gravity := -30.0
 
 @onready var camera_pivot: Node3D = %CameraPivot
 @onready var camera: Camera3D = %Camera3D
-@onready var character_model: CharacterBody3D = $\".\"
-@onready var character_female_b: Node3D = %\"character-female-b\"
+@onready var character_model: Node3D = %\"character-female-b\"
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
 
@@ -32,7 +31,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if is_camera_motion:
 		_camera_input_direction = event.screen_relative * mouse_sensitivity
 
+
+
 func _physics_process(delta: float) -> void:
+
+#camera rotation
+	camera_pivot.rotation.x += _camera_input_direction.y * delta
+	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI / 6.0, PI/3.0)
+	camera_pivot.rotation.y -= _camera_input_direction.x * delta
+	_camera_input_direction = Vector2.ZERO
+
 
 #player movement
 	var raw_input := Input.get_vector(\"move_left\", \"move_right\", \"move_up\", \"move_down\")
@@ -44,12 +52,6 @@ func _physics_process(delta: float) -> void:
 	move_direction.y = 0.0
 	move_direction = move_direction.normalized()
 	
-#calc character velocity
-	velocity = velocity.move_toward(move_direction * move_speed, acceleration * delta)
-
-#move and slide
-	move_and_slide()
-	
 #store movement direction thing
 	if move_direction.length() > 0.0:
 		last_movement_direction = move_direction
@@ -58,37 +60,31 @@ func _physics_process(delta: float) -> void:
 #------
 	character_model.global_rotation.y = lerp_angle(character_model.rotation.y, target_angle, rotation_speed * delta)
 #------
-	var ground_speed := velocity.length()
-	if ground_speed > 0.0:
-		animation_player.play(\"walk\")
-	else:
-		animation_player.play(\"idle\")
+	
+
 	#------
 	var y_velocity := velocity.y
 	velocity.y = 0.0
-	#------
-	camera_pivot.rotation.x += _camera_input_direction.y * delta
-	camera_pivot.rotation.x = clamp(camera_pivot.rotation.x, -PI / 6.0, PI/3.0)
-	camera_pivot.rotation.y -= _camera_input_direction.x * delta
-	_camera_input_direction = Vector2.ZERO
-	#------
+	velocity = velocity.move_toward(move_direction * move_speed, acceleration * delta)
+	#apply gravity
 	velocity.y = y_velocity + gravity * delta
-#------
+	#jump start
 	var is_starting_jump := Input.is_action_just_pressed(\"jump\") and is_on_floor()
-	if is_starting_jump:
-		velocity.y +=jump_impulse
-#------
+	#move and slide function
+	move_and_slide()
+	#------
 	if is_starting_jump:
 		animation_player.play(\"jump\")
 	elif not is_on_floor() and velocity.y < 0:
 		animation_player.play(\"fall\")
-#------
 	elif is_on_floor():
+		var ground_speed := velocity.length()
 		if ground_speed > 0.0:
 			animation_player.play(\"walk\")
-	else:
-		animation_player.play(\"idle\")
+		else:
+			animation_player.play(\"idle\")
 	#------
+#INPUT FUNCTION START
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(\"left_click\"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
