@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dkh6o63yscll"]
+
+[ext_resource type="Script" uid="uid://re178ohfv1f4" path="res://collectible.gd" id="1_rd2yi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8orai"]
+
+[node name="Area3D" type="Area3D" unique_id=36126810]
+script = ExtResource("1_rd2yi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1666893698]
+shape = SubResource("BoxShape3D_8orai")

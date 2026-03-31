@@ -3,11 +3,12 @@
 [sub_resource type="GDScript" id="GDScript_uk8bg"]
 script/source = "extends CharacterBody3D
 
-var last_movement_direction := Vector3.BACK
+
 
 @export_group(\"Camera\")
 @export_range(0.0, 1.0) var mouse_sensitivity := 0.25
 var _camera_input_direction := Vector2.ZERO
+var last_movement_direction := Vector3.BACK
 
 @export_group(\"Movement\")
 @export var move_speed := 8.0
@@ -22,6 +23,11 @@ var gravity := -30.0
 @onready var character_model: Node3D = %\"character-female-b\"
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"left_click\"):
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if event.is_action_pressed(\"ui_cancel\"):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _unhandled_input(event: InputEvent) -> void:
 	var is_camera_motion := (
@@ -51,15 +57,7 @@ func _physics_process(delta: float) -> void:
 	var move_direction : Vector3 = forward * raw_input.y + right * raw_input.x
 	move_direction.y = 0.0
 	move_direction = move_direction.normalized()
-	
-#store movement direction thing
-	if move_direction.length() > 0.0:
-		last_movement_direction = move_direction
-#------
-	var target_angle := Vector3.BACK.signed_angle_to(last_movement_direction, Vector3.UP)
-#------
-	character_model.global_rotation.y = lerp_angle(character_model.rotation.y, target_angle, rotation_speed * delta)
-#------
+
 	
 
 	#------
@@ -70,8 +68,19 @@ func _physics_process(delta: float) -> void:
 	velocity.y = y_velocity + gravity * delta
 	#jump start
 	var is_starting_jump := Input.is_action_just_pressed(\"jump\") and is_on_floor()
+	if is_starting_jump:
+			velocity.y +=jump_impulse
 	#move and slide function
 	move_and_slide()
+	
+	#store movement direction thing
+	if move_direction.length() > 0.0:
+		last_movement_direction = move_direction
+#------
+	var target_angle := Vector3.BACK.signed_angle_to(last_movement_direction, Vector3.UP)
+#------
+	character_model.global_rotation.y = lerp_angle(character_model.rotation.y, target_angle, rotation_speed * delta)
+#------
 	#------
 	if is_starting_jump:
 		animation_player.play(\"jump\")
@@ -85,16 +94,11 @@ func _physics_process(delta: float) -> void:
 			animation_player.play(\"idle\")
 	#------
 #INPUT FUNCTION START
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed(\"left_click\"):
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	if event.is_action_pressed(\"ui_cancel\"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 "
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_8xjnt"]
 radius = 0.37286377
-height = 0.74572754
+height = 0.8538208
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_677wx"]
 resource_name = "colormap"
@@ -2801,7 +2805,7 @@ collision_mask = 14
 script = SubResource("GDScript_uk8bg")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1865885140]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37615967, 0)
+transform = Transform3D(0.9995363, 0, 0.030451287, 0, 1, 0, -0.030451287, 0, 0.9995363, 0, 0.4302063, 0)
 shape = SubResource("CapsuleShape3D_8xjnt")
 
 [node name="character-female-b" type="Node3D" parent="." unique_id=1656343263]

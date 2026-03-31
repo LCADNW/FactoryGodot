@@ -1,8 +1,21 @@
 [gd_scene format=3 uid="uid://b5h2tondqkhfe"]
 
 [ext_resource type="PackedScene" uid="uid://cfnsx2mee6u8q" path="res://crate_1b_2.tscn" id="1_0f027"]
-[ext_resource type="PackedScene" uid="uid://ecnkdtxv1fmo" path="res://player_2.tscn" id="1_gyfs4"]
 [ext_resource type="PackedScene" uid="uid://co8ihm116djmu" path="res://wall_1.tscn" id="3_gyfs4"]
+[ext_resource type="PackedScene" uid="uid://bynomju511kxp" path="res://block.tscn" id="4_d5x1h"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gyfs4"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_d5x1h"]
+sky_material = SubResource("ProceduralSkyMaterial_gyfs4")
+
+[sub_resource type="Environment" id="Environment_8mm7a"]
+background_mode = 2
+sky = SubResource("Sky_d5x1h")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="GDScript" id="GDScript_2c62f"]
 resource_name = "FallDetect"
@@ -30,11 +43,20 @@ albedo_color = Color(1, 0.16078432, 0, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d5x1h"]
 albedo_color = Color(0.19607843, 1, 1, 1)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_d5x1h"]
+size = Vector3(5, 1, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gyfs4"]
+size = Vector3(5, 1, 5)
+
 [node name="Main Scene" type="Node3D" unique_id=1430575248]
 
-[node name="Player2" parent="." unique_id=480999389 instance=ExtResource("1_gyfs4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03813076, 25.096706, 10.387112)
-collision_mask = 13
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1036980993]
+environment = SubResource("Environment_8mm7a")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=663280735]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
 
 [node name="FallZone" type="Area3D" parent="." unique_id=1260965408]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -6.9101925, 54.138264)
@@ -330,13 +352,15 @@ height = 16.028076
 transform = Transform3D(0.8852151, 0.46518198, 0, -0.46518198, 0.8852151, 0, 0, 0, 1, -0.81942487, -1.5593194, 0)
 size = Vector3(8.6623535, 0.38378906, 1.6933594)
 
-[node name="floor" type="CSGBox3D" parent="." unique_id=832763732]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.248848, -0.8584621, -1.3597164)
-layers = 2
-use_collision = true
+[node name="Floor" type="StaticBody3D" parent="." unique_id=190199641]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.009165, -0.8584621, 72.61474)
 collision_layer = 2
-collision_mask = 0
-size = Vector3(119.76514, 1, 51.277344)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=66780617]
+shape = SubResource("BoxShape3D_d5x1h")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=1464419417]
+mesh = SubResource("BoxMesh_gyfs4")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=486280184]
 transform = Transform3D(1, 0, 0, 0, 0.8227794, -0.5683608, 0, 0.5683608, 0.8227794, 21.937666, 2.347602, 7.2932863)
@@ -344,6 +368,12 @@ layers = 2
 use_collision = true
 collision_layer = 2
 size = Vector3(3.4643555, 1, 7.314209)
+
+[node name="block" parent="." unique_id=1085591659 instance=ExtResource("4_d5x1h")]
+transform = Transform3D(1, 0, 0, 0, 0.7822821, -0.6229243, 0, 0.6229243, 0.7822821, -10.282827, 1.678288, 73.66532)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=307242745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.063603, 1.035285, 77.55414)
 
 [editable path="Wall7"]
 [editable path="Wall8"]
